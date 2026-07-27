@@ -17,6 +17,19 @@ terraform {
 }
 
 provider "aws" {
+  region = "us-east-2"
+
+  default_tags {
+    tags = {
+      Environment = "test"
+      Project     = "zeroish"
+      Purpose     = "v1.0.0-validation"
+    }
+  }
+}
+
+provider "aws" {
+  alias  = "us_east_1"
   region = "us-east-1"
 
   default_tags {
@@ -44,8 +57,11 @@ module "dns_zone" {
 # Create the static site
 module "static_site" {
   source    = "git::https://github.com/zeroish/tofu-modules.git//modules/static-site?ref=static-site/v1.0.0"
-  domain_name = var.domain_name
-  zone_id   = module.dns_zone.zone_id
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
+  domain_name   = var.domain_name
+  zone_id       = module.dns_zone.zone_id
   force_destroy = true  # Allow cleanup in tests
 }
 
@@ -78,7 +94,7 @@ output "site_url" {
 }
 
 output "nameservers" {
-  value       = module.dns_zone.nameservers
+  value       = module.dns_zone.name_servers
   description = "Route53 nameservers for the hosted zone"
 }
 
