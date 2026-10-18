@@ -51,8 +51,8 @@ variable "domain_name" {
 
 # Create the DNS hosted zone
 module "dns_zone" {
-  source = "git::https://github.com/zeroish/tofu-modules.git//modules/dns-zone?ref=dns-zone/v1.0.0"
-  domain = var.domain_name
+  source  = "git::https://github.com/zeroish/tofu-modules.git//modules/dns-zone?ref=dns-zone/v1.0.0"
+  domain  = var.domain_name
   comment = "v1.0.0 validation site"
 }
 
@@ -78,23 +78,23 @@ resource "aws_route53_record" "delegation" {
 
 # Create the static site
 module "static_site" {
-  source    = "git::https://github.com/zeroish/tofu-modules.git//modules/static-site?ref=static-site/v1.0.0"
+  source = "git::https://github.com/zeroish/tofu-modules.git//modules/static-site?ref=static-site/v1.0.0"
   providers = {
     aws.us_east_1 = aws.us_east_1
   }
   domain_name   = var.domain_name
   zone_id       = module.dns_zone.zone_id
-  force_destroy = true  # Allow cleanup in tests
+  force_destroy = true # Allow cleanup in tests
 
   depends_on = [aws_route53_record.delegation]
 }
 
 # Simple lambda function code
 data "archive_file" "lambda_zip" {
-  type               = "zip"
-  source_content     = "def handler(event, context): return {'statusCode': 200, 'body': 'v1.0.0 validation test'}\n"
+  type                    = "zip"
+  source_content          = "def handler(event, context): return {'statusCode': 200, 'body': 'v1.0.0 validation test'}\n"
   source_content_filename = "index.py"
-  output_path        = "${path.module}/lambda.zip"
+  output_path             = "${path.module}/lambda.zip"
 }
 
 # Create a simple lambda function for testing
