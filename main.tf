@@ -17,7 +17,8 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-2"
+  region              = "us-east-2"
+  allowed_account_ids = ["136467753348"] # zeroish-prod
 
   default_tags {
     tags = {
@@ -29,8 +30,9 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias  = "us_east_1"
-  region = "us-east-1"
+  alias               = "us_east_1"
+  region              = "us-east-1"
+  allowed_account_ids = ["136467753348"] # zeroish-prod
 
   default_tags {
     tags = {
