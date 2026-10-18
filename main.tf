@@ -56,6 +56,26 @@ module "dns_zone" {
   comment = "v1.0.0 validation site"
 }
 
+variable "parent_domain" {
+  type        = string
+  description = "Domain of the parent hosted zone in this account"
+  default     = "zeroish.dev"
+}
+
+data "aws_route53_zone" "parent" {
+  name = var.parent_domain
+}
+
+# Delegate the test zone from the parent zone. Without this record, the
+# certificate validation records do not resolve and ACM fails.
+resource "aws_route53_record" "delegation" {
+  zone_id = data.aws_route53_zone.parent.zone_id
+  name    = var.domain_name
+  type    = "NS"
+  ttl     = 300
+  records = module.dns_zone.name_servers
+}
+
 # Create the static site
 module "static_site" {
   source    = "git::https://github.com/zeroish/tofu-modules.git//modules/static-site?ref=static-site/v1.0.0"
@@ -65,6 +85,8 @@ module "static_site" {
   domain_name   = var.domain_name
   zone_id       = module.dns_zone.zone_id
   force_destroy = true  # Allow cleanup in tests
+
+  depends_on = [aws_route53_record.delegation]
 }
 
 # Simple lambda function code
