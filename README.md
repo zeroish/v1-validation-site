@@ -13,8 +13,8 @@ End-to-end validation that all v1.0.0 modules are reusable and work together to 
 
 1. AWS credentials configured via SSO:
    ```bash
-   aws sso login --sso-session highbury
-   export AWS_PROFILE=highbury-management-admin
+   aws sso login --sso-session gilmatic
+   export AWS_PROFILE=zeroish-prod-admin
    ```
 
 2. OpenTofu installed (or Terraform >= 1.0)
