@@ -15,3 +15,6 @@ terraform.rc
 *.swo
 *~
 .DS_Store
+
+# Build output of data.archive_file.lambda_zip
+lambda.zip
